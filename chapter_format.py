@@ -25,6 +25,24 @@ if __name__ == "__main__":
     create_path = os.getcwd() + "\\" + "project_file"
     add_file_name = "summarybook.docx"
     print(create_path + "\\" + add_file_name)
+
+    #路径存在与否判断
+    path_exist = os.path.exists(create_path)  # 判断当前目录路径是否存在
+    if path_exist:
+        print("该目录存在")
+        print(path_exist)
+    else:
+        print("该目录不存在")
+        print(path_exist)
+        os.mkdir(create_path)  # 若不存在目录则先新建一个目录
+
+    file_exist = os.path.exists(create_path + "\\" + add_file_name)  # 判断当前文件路径是否存在，不存在也没事后面save会新建
+    if file_exist:
+        print("该文件存在")
+    else:
+        print("该文件不存在")
+
+    # 创建文件基本对象信息
     document_object = Document()  # 创建文件对象
     run_heading = document_object.add_heading("", level=1)
     run = run_heading.add_run("第一章First Chapter")  # 以追加段落格式方便后续修改
