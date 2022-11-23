@@ -27,7 +27,7 @@ if __name__ == "__main__":
     print(create_path + "\\" + add_file_name)
 
     #路径存在与否判断
-    path_exist = os.path.exists(create_path)  # 判断当前目录路径是否存在
+    path_exist = os.path.exists(create_path)
     if path_exist:
         print("该目录存在")
         print(path_exist)
