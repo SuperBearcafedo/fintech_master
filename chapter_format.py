@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
-
+import traceback
 import base_import
 import docx
 from docx import Document
@@ -23,6 +24,10 @@ class Chapter:  # 类采用Pascal命名风格
         self.cn = chapter_name
 
     def createTitle(self):  # 小驼峰命名法：局部使用
+        """
+        入参：self
+        :return: none
+        """
         self.existChapterFile()
         # 创建文件基本对象信息
         run_heading = self.document_object.add_heading("", level=1)
@@ -79,7 +84,4 @@ if __name__ == "__main__":
 
     first_chapter = Chapter(create_path, add_file_name, title_name, chapter_name)
     first_chapter.createTitle()
-
-
-
-
+    first_chapter.createTable()
