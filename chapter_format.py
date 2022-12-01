@@ -84,4 +84,3 @@ if __name__ == "__main__":
 
     first_chapter = Chapter(create_path, add_file_name, title_name, chapter_name)
     first_chapter.createTitle()
-    first_chapter.createTable()
