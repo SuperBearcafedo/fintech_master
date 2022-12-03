@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import numpy as np
+import matplotlib.pylab as plt
 
 from common_funcs import homo_list_length, compare_list_element
 
@@ -59,8 +61,18 @@ def anti_unit_step(value, threshold):
 # ToDo：返回的节约函数结果的元素类型应该一致，比如int全部转化为int,float全部转化为float
 # ToDo：实现阶跃函数的NumPy化和图形化
 
+def np_unit_step(np_array):
+    np_array_copy = np_array > 0
+    # return np.array(np_array > 0, dtype=np.int)
+    return np_array_copy.astype(int)
+
 
 if __name__ == "__main__":
     print(unit_step(1, 2))  # 实例1
     print(unit_step([1, -1], 2))  # 实例2
     print(unit_step(1, [-1, 100, -1]))  # 实例3
+    x = np.arange(-5.0, 5.0, 0.1)  # [-5,5]以0.1间距取值
+    y = np_unit_step(x)
+    plt.plot(x, y)
+    plt.ylim(-0.1, 1.1)  # 限制y的范围
+    plt.show()
