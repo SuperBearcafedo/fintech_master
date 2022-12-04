@@ -2,6 +2,9 @@
 import os
 import sys
 import traceback
+
+from docx.styles import style
+
 import base_import
 import docx
 from docx import Document
@@ -59,6 +62,59 @@ class pdf:
         self.tn = title_name
         self.cn = chapter_name
 
+    def createPdfParagph(text:str):
+        # # 获取普通样式
+        # ct = styles['Normal']
+        # ct.fontName = 'SimSun'
+        # ct.fontSize = 12
+        # ct.wordWrap = 'CJK'  # 设置自动换行
+        # ct.alignment = 0  # 左对齐
+        # ct.firstLineIndent = 32  # 第一行开头空格
+        # ct.leading = 25
+        # return Paragraph
+
+        # 获取所有样式表
+        style = getSampleStyleSheet()
+        titleStyele = style['Title']
+
+        # 将段落添加到内容中
+        return Paragraph(text, titleStyele)
+
+    def createPdfImg(img):
+        styles = getSampleStyleSheet()
+        style = styles['Normal']
+        #图片插入:插入需要指定长宽，自适应做的不好，将固定路径改为变量获取
+        img = Image(picture_path, width=370, height=210)
+        return img
+
+    def createPdfForm(data):
+        data = Table(data)
+        data.setStyle(TableStyle(
+            [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+             ('BOX', (0, 0), (-1, -1), 2, colors.black),
+             ('LINEBELOW', (0, 0), (-1, 0), 2, colors.yellow),
+             ('LINEAFTER', (0, 0), (0, -1), 2, colors.blue),
+             ('ALIGN', (1, 1), (-1, -1), 'RIGHT')]
+        ))
+        # 补充：
+        # FONTNAME：字体名称
+        # FONTSIZE：字体大小
+        # LEADING：行间距
+        # TEXTCOLOR：字体颜色
+        # ALIGNMENT：水平对齐方式（可选值："LEFT"，”RIGHT“，”CENTER“）
+        # LEFTPADDING：左边填充
+        # RIGHTPADDING：右边填充
+        # BOTTOMPADDING：底部填充
+        # TOPPADDING：顶部填充
+        # BACKGROUND：背景色
+        # VALIGN：垂直对齐方式（可选值："TOP"，“MIDDLE”，“BOTTOM”）
+        # GRID：表格颜色，被指定的行列中的所有子行和子列都被设置成相应颜色
+        # INNERGRID：表格颜色，仅仅修改指定的子行和子列的相应颜色（不包括边框）
+        # BOX：边框颜色，被指定的边框的颜色
+        # LINEBELOW：指定块底部的行颜色
+        # LINEAFTER：指定块右边的行颜色。
+        return data
+
 
 if __name__ == "__main__":
     create_path = os.path.join(os.getcwd(), "project_file")
@@ -66,65 +122,32 @@ if __name__ == "__main__":
     title_name = "第一章/First Chapter"
     chapter_name = "深度学习Python从入门到实践111"
 
-    # # 调用模板，创建指定名称的pdf文档
-    doc = SimpleDocTemplate("Hello.pdf")
-    styles = getSampleStyleSheet()  #获取模板表格
-    style = styles['Normal']        #指定模板
-    story = []                      #初始化列表
-    # # 将段落添加到内容中
-    story.append(Paragraph("this is the first Document!", style))
-    doc.build(story)                #将内容输出到PDF中
-    #
-    stylesheet = getSampleStyleSheet()
-    titleStyele = stylesheet['Title']
-    storytitle = []  # 初始化列表
-    # 将段落添加到内容中
-    storytitle.append(Paragraph("this is the second Document!", titleStyele))
-    doc.build(storytitle)  # 将内容输出到PDF中
+    pdf(create_path, add_file_name, title_name, chapter_name)
+    # 创建一个空列表
+    content = list()
 
-    # # 初始化表格内容
+    #添加图片--引用类中方法createPdf
+    current_pdf_path = os.getcwd()
+    print("current_path " + current_pdf_path)
+    picture_path = os.path.join(current_pdf_path, "pictures", "mofang.jpg")
+    content.append(pdf.createPdfImg(picture_path))
+
+    # 添加段落
+    content.append(pdf.createPdfParagph('Python'))
+
+    #添加表格:先初始化再
     data = [['00', '01', '02', '03', '04'],
             ['10', '11', '12', '13', '14'],
             ['20', '21', '22', '23', '24'],
             ['30', '31', '32', '33', '34']]
-    # # 根据内容创建表格
-    t = Table(data)
-    t.setStyle(TableStyle(
-        [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-         ('BOX', (0, 0), (-1, -1), 2, colors.black),
-         ('LINEBELOW', (0, 0), (-1, 0), 2, colors.yellow),
-         ('LINEAFTER', (0, 0), (0, -1), 2, colors.blue),
-         ('ALIGN', (1, 1), (-1, -1), 'RIGHT')]
-    ))
-    # #补充：
-    # # FONTNAME：字体名称
-    # # FONTSIZE：字体大小
-    # # LEADING：行间距
-    # # TEXTCOLOR：字体颜色
-    # # ALIGNMENT：水平对齐方式（可选值："LEFT"，”RIGHT“，”CENTER“）
-    # # LEFTPADDING：左边填充
-    # # RIGHTPADDING：右边填充
-    # # BOTTOMPADDING：底部填充
-    # # TOPPADDING：顶部填充
-    # # BACKGROUND：背景色
-    # # VALIGN：垂直对齐方式（可选值："TOP"，“MIDDLE”，“BOTTOM”）
-    # # GRID：表格颜色，被指定的行列中的所有子行和子列都被设置成相应颜色
-    # # INNERGRID：表格颜色，仅仅修改指定的子行和子列的相应颜色（不包括边框）
-    # # BOX：边框颜色，被指定的边框的颜色
-    # # LINEBELOW：指定块底部的行颜色
-    # # LINEAFTER：指定块右边的行颜色。
+    content.append(pdf.createPdfForm(data))
+
+    #生成pdf文件
+    doc = SimpleDocTemplate("last.pdf")
+    doc.build(content)
 
 
-    # # 将表格添加到内容中
-    #story.append(t)
-    # # 将内容输出到PDF中
-     #doc.build(story)
 
-    doc = SimpleDocTemplate("Hello.pdf")
-    styles = getSampleStyleSheet()
-    style = styles['Normal']
-    story = []
-    #图片插入:插入需要指定长宽，自适应做的不好
-    t = Image("C:\\Users\\89706\\Desktop\\mofang.jpg",width=210-doc.rightMargin-doc.leftMargin,height=293-doc.topMargin-doc.bottomMargin)
-    story.append(t)
-    doc.build(story)
+
+
+
