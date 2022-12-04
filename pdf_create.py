@@ -23,6 +23,12 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Image
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors  # 颜色模块
+from reportlab.graphics.charts.barcharts import VerticalBarChart  # 图表类
+from reportlab.graphics.charts.legends import Legend  # 图例类
+from reportlab.graphics.shapes import Drawing  # 绘图工具
+from reportlab.lib.units import cm  # 单位：cm
+
 
 #新建段落格式类
 class ParagraphStyle():
@@ -62,6 +68,22 @@ class pdf:
         self.tn = title_name
         self.cn = chapter_name
 
+    def createPdfTitle(title):
+        style = getSampleStyleSheet()
+        ct = style['Heading1']
+        ct.fontSize = 18
+        ct.textColor = colors.green
+        ct.alignment = 1
+        ct.bold = True
+        return Paragraph(title,ct)
+
+    def createPdf_little_title(title):
+        style = getSampleStyleSheet()
+        ct = style['Normal']
+        ct.fontSize = 15
+        ct.leading = 30
+        ct.textColor = colors.red
+        return Paragraph(title,ct)
     def createPdfParagph(text:str):
         # # 获取普通样式
         # ct = styles['Normal']
@@ -115,6 +137,35 @@ class pdf:
         # LINEAFTER：指定块右边的行颜色。
         return data
 
+    def createPdfChart(data:list,ax:list,items:list):
+        drawing = Drawing(500,250)
+        bc = VerticalBarChart()
+        bc.x = 45  # 整个图表的x坐标
+        bc.y = 45  # 整个图表的y坐标
+        bc.height = 200  # 图表的高度
+        bc.width = 350  # 图表的宽度
+        bc.data = data
+        bc.strokeColor = colors.black  # 顶部和右边轴线的颜色
+        bc.valueAxis.valueMin = 5000  # 设置y坐标的最小值
+        bc.valueAxis.valueMax = 26000  # 设置y坐标的最大值
+        bc.valueAxis.valueStep = 2000  # 设置y坐标的步长
+        bc.categoryAxis.labels.dx = 2
+        bc.categoryAxis.labels.dy = -8
+        bc.categoryAxis.labels.angle = 20
+        bc.categoryAxis.categoryNames = ax
+
+        # 图示
+        leg = Legend()
+        leg.alignment = 'right'
+        leg.boxAnchor = 'ne'
+        leg.x = 475  # 图例的x坐标
+        leg.y = 240
+        leg.dxTextSpace = 10
+        leg.columnMaximum = 3
+        leg.colorNamePairs = items
+        drawing.add(leg)
+        drawing.add(bc)
+        return drawing
 
 if __name__ == "__main__":
     create_path = os.path.join(os.getcwd(), "project_file")
@@ -132,7 +183,12 @@ if __name__ == "__main__":
     picture_path = os.path.join(current_pdf_path, "pictures", "mofang.jpg")
     content.append(pdf.createPdfImg(picture_path))
 
-    # 添加段落
+    #添加标题
+    content.append(pdf.createPdfTitle('We are the champion'))
+    #添加小标题
+    content.append(pdf.createPdfTitle(''))
+    content.append(pdf.createPdf_little_title('good idea'))
+    #添加段落
     content.append(pdf.createPdfParagph('Python'))
 
     #添加表格:先初始化再
@@ -141,6 +197,15 @@ if __name__ == "__main__":
             ['20', '21', '22', '23', '24'],
             ['30', '31', '32', '33', '34']]
     content.append(pdf.createPdfForm(data))
+
+    #生成图表
+    content.append(pdf.createPdfTitle(''))
+    content.append(pdf.createPdf_little_title('employment situation'))
+    data =[(25400, 12900, 20100, 20300, 20300, 17400), (15800, 9700, 12982, 9283, 13900, 7623)]
+    ax_data = ['BeiJing', 'ChengDu', 'ShenZhen', 'ShangHai', 'HangZhou', 'NanJing']
+    leg_items = [(colors.red, 'average'), (colors.green, 'numbers')]
+
+    content.append(pdf.createPdfChart(data,ax_data,leg_items))
 
     #生成pdf文件
     doc = SimpleDocTemplate("last.pdf")
