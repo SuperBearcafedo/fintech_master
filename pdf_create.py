@@ -61,30 +61,44 @@ class ParagraphStyle():
 
     }
 class pdf:
-    def __init__(self, create_path, add_file_name, title_name, chapter_name):
-        self.document_object = Document()  # 创建文件对象
-        self.create_path = create_path
-        self.add_file_name = add_file_name
-        self.tn = title_name
-        self.cn = chapter_name
+    # def __init__(self, create_path, add_file_name, title_name, chapter_name):
+    #     self.document_object = Document()  # 创建文件对象
+    #     self.create_path = create_path
+    #     self.add_file_name = add_file_name
+    #     self.tn = title_name
+    #     self.cn = chapter_name
 
-    def createPdfTitle(title):
+    def __init__(self,title_name,little_title_name,paragraph_name,pdf_name,data,employment_data,ax_data,leg_items):
+        self.content = list()    #创建一个空列表
+        self.title = title_name
+        self.little_title_name = little_title_name
+        self.paragraph_name = paragraph_name
+        self.pdf_name = pdf_name
+        self.data =Table(data)
+        self.employment_data = employment_data
+        self.ax_data = ax_data
+        self.leg_items = leg_items
+        self.drawing = Drawing(500, 250)
+
+    def createPdfTitle(self):
         style = getSampleStyleSheet()
         ct = style['Heading1']
         ct.fontSize = 18
         ct.textColor = colors.green
         ct.alignment = 1
         ct.bold = True
-        return Paragraph(title,ct)
+        self.content.append(Paragraph(self.title,ct))
+        self.pdfform()
 
-    def createPdf_little_title(title):
+    def createPdf_little_title(self):
         style = getSampleStyleSheet()
         ct = style['Normal']
         ct.fontSize = 15
         ct.leading = 30
         ct.textColor = colors.red
-        return Paragraph(title,ct)
-    def createPdfParagph(text:str):
+        self.content.append(Paragraph(self.little_title_name,ct))
+        self.pdfform()
+    def createPdfParagph(self):
         # # 获取普通样式
         # ct = styles['Normal']
         # ct.fontName = 'SimSun'
@@ -100,18 +114,22 @@ class pdf:
         titleStyele = style['Title']
 
         # 将段落添加到内容中
-        return Paragraph(text, titleStyele)
+        self.content.append(Paragraph(self.paragraph_name,titleStyele))
+        self.pdfform()
 
-    def createPdfImg(img):
+    def createPdfImg(self):
         styles = getSampleStyleSheet()
         style = styles['Normal']
         #图片插入:插入需要指定长宽，自适应做的不好，将固定路径改为变量获取
-        img = Image(picture_path, width=370, height=210)
-        return img
+        current_pdf_path = os.getcwd()
+        print("current_path " + current_pdf_path)
+        picture_path = os.path.join(current_pdf_path, "pictures", "mofang.jpg")
+        self.content.append(Image(picture_path, width=370, height=210))
+        self.pdfform()
 
-    def createPdfForm(data):
-        data = Table(data)
-        data.setStyle(TableStyle(
+    def createPdfForm(self):
+
+        self.data.setStyle(TableStyle(
             [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
              ('BOX', (0, 0), (-1, -1), 2, colors.black),
              ('LINEBELOW', (0, 0), (-1, 0), 2, colors.yellow),
@@ -135,16 +153,15 @@ class pdf:
         # BOX：边框颜色，被指定的边框的颜色
         # LINEBELOW：指定块底部的行颜色
         # LINEAFTER：指定块右边的行颜色。
-        return data
-
-    def createPdfChart(data:list,ax:list,items:list):
-        drawing = Drawing(500,250)
+        self.content.append(self.data)
+        self.pdfform()
+    def createPdfChart(self):
         bc = VerticalBarChart()
         bc.x = 45  # 整个图表的x坐标
         bc.y = 45  # 整个图表的y坐标
         bc.height = 200  # 图表的高度
         bc.width = 350  # 图表的宽度
-        bc.data = data
+        bc.data = self.employment_data
         bc.strokeColor = colors.black  # 顶部和右边轴线的颜色
         bc.valueAxis.valueMin = 5000  # 设置y坐标的最小值
         bc.valueAxis.valueMax = 26000  # 设置y坐标的最大值
@@ -152,7 +169,7 @@ class pdf:
         bc.categoryAxis.labels.dx = 2
         bc.categoryAxis.labels.dy = -8
         bc.categoryAxis.labels.angle = 20
-        bc.categoryAxis.categoryNames = ax
+        bc.categoryAxis.categoryNames = self.ax_data
 
         # 图示
         leg = Legend()
@@ -162,10 +179,16 @@ class pdf:
         leg.y = 240
         leg.dxTextSpace = 10
         leg.columnMaximum = 3
-        leg.colorNamePairs = items
-        drawing.add(leg)
-        drawing.add(bc)
-        return drawing
+        leg.colorNamePairs = self.leg_items
+        self.drawing.add(leg)
+        self.drawing.add(bc)
+        self.content.append(self.drawing)
+        self.pdfform()
+
+    def pdfform(self):
+        doc = SimpleDocTemplate(self.pdf_name)
+        doc.build(self.content)
+
 
 if __name__ == "__main__":
     create_path = os.path.join(os.getcwd(), "project_file")
@@ -173,46 +196,20 @@ if __name__ == "__main__":
     title_name = "第一章/First Chapter"
     chapter_name = "深度学习Python从入门到实践111"
 
-    pdf(create_path, add_file_name, title_name, chapter_name)
-    # 创建一个空列表
-    content = list()
+    # pdf(create_path, add_file_name, title_name, chapter_name)
 
-    #添加图片--引用类中方法createPdf
-    current_pdf_path = os.getcwd()
-    print("current_path " + current_pdf_path)
-    picture_path = os.path.join(current_pdf_path, "pictures", "mofang.jpg")
-    content.append(pdf.createPdfImg(picture_path))
-
-    #添加标题
-    content.append(pdf.createPdfTitle('We are the champion'))
-    #添加小标题
-    content.append(pdf.createPdfTitle(''))
-    content.append(pdf.createPdf_little_title('good idea'))
-    #添加段落
-    content.append(pdf.createPdfParagph('Python'))
-
-    #添加表格:先初始化再
     data = [['00', '01', '02', '03', '04'],
             ['10', '11', '12', '13', '14'],
             ['20', '21', '22', '23', '24'],
             ['30', '31', '32', '33', '34']]
-    content.append(pdf.createPdfForm(data))
-
-    #生成图表
-    content.append(pdf.createPdfTitle(''))
-    content.append(pdf.createPdf_little_title('employment situation'))
-    data =[(25400, 12900, 20100, 20300, 20300, 17400), (15800, 9700, 12982, 9283, 13900, 7623)]
+    employment_data =[(25400, 12900, 20100, 20300, 20300, 17400), (15800, 9700, 12982, 9283, 13900, 7623)]
     ax_data = ['BeiJing', 'ChengDu', 'ShenZhen', 'ShangHai', 'HangZhou', 'NanJing']
     leg_items = [(colors.red, 'average'), (colors.green, 'numbers')]
 
-    content.append(pdf.createPdfChart(data,ax_data,leg_items))
-
-    #生成pdf文件
-    doc = SimpleDocTemplate("last.pdf")
-    doc.build(content)
-
-
-
-
-
-
+    first_pdf = pdf('We are the champion','good idea','Python','new2222.pdf',data,employment_data,ax_data,leg_items)
+    first_pdf.createPdfTitle()
+    first_pdf.createPdf_little_title()
+    first_pdf.createPdfParagph()
+    first_pdf.createPdfImg()
+    first_pdf.createPdfForm()
+    first_pdf.createPdfChart()
