@@ -2,8 +2,8 @@
 import numpy as np
 import matplotlib.pylab as plt
 
-from unit_step_func import np_unit_step
-from sigmoid_func import sigmoid
+from activation_funcs.unit_step_func import np_unit_step
+from activation_funcs.sigmoid_func import sigmoid
 
 
 def softmax_basic(np_array):
@@ -35,5 +35,5 @@ if __name__ == "__main__":
     x = np.arange(-5.0, 5, 0.1)
     y = softmax(x)
 
-    plt.plot(x, y)
-    plt.show()
+    #plt.plot(x, y)
+    #plt.show()

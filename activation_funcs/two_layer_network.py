@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from sigmoid_func import sigmoid
-from softmax_func import softmax
+from activation_funcs.sigmoid_func import sigmoid
+from activation_funcs.softmax_func import softmax
 
 
 def numerical_gradient(f, x):

@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pylab as plt
 
-from unit_step_func import np_unit_step
+from activation_funcs.unit_step_func import np_unit_step
 
 
 def sigmoid(np_array):

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import matplotlib.pylab as plt
+#import matplotlib.pylab as plt
 
-from common_funcs import homo_list_length, compare_list_element
+from activation_funcs.common_funcs import homo_list_length, compare_list_element
 
 """
     python常用的三个类型函数判定：
@@ -73,6 +73,6 @@ if __name__ == "__main__":
     print(unit_step(1, [-1, 100, -1]))  # 实例3
     x = np.arange(-5.0, 5.0, 0.1)  # [-5,5]以0.1间距取值
     y = np_unit_step(x)
-    plt.plot(x, y)
-    plt.ylim(-0.1, 1.1)  # 限制y的范围
-    plt.show()
+    #plt.plot(x, y)
+    #plt.ylim(-0.1, 1.1)  # 限制y的范围
+    #plt.show()
